@@ -27,6 +27,8 @@ LOCAL_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    "rest_framework",
+    "drf_spectacular",
     "django_extensions",
 ]
 
@@ -41,6 +43,13 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",  # JSON 응답만 활성화
+    ],
+}
 
 ROOT_URLCONF = "blog_poc.urls"
 
@@ -76,6 +85,26 @@ DATABASES = {
     },
 }
 
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
+
+# 캐시 설정 (Redis)
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",  # Redis 서버의 위치
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "PASSWORD": None,  # Redis 비밀번호가 있는 경우 설정
+        },
+        "KEY_PREFIX": "blog_session",  # Redis 키에 붙는 접두사
+    },
+}
+
+# 세션 유효 기간 설정 (기본: 2주)
+SESSION_COOKIE_AGE = 60 * 60 * 24  # 1일 (초 단위)
+SESSION_SAVE_EVERY_REQUEST = True  # 매 요청마다 세션 갱신
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # 브라우저 닫히면 세션 expire처리
 
 LOGGING = {
     "version": 1,

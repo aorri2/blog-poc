@@ -22,6 +22,7 @@ sqlparse = "0.5.2"
 uritemplate = "4.1.1"
 psycopg2-binary = "^2.9.10"
 python-decouple = "^3.8"
+django-redis = "^5.4.0"
 
 
 [build-system]
