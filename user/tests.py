@@ -5,6 +5,7 @@ from rest_framework.test import APITestCase
 
 User = get_user_model()
 
+
 class SignupViewTest(APITestCase):
 
     def setUp(self):
@@ -56,3 +57,58 @@ class SignupViewTest(APITestCase):
         # 응답 코드 확인
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("username", response.data)  # username 중복 에러 확인
+
+
+class LoginViewTest(APITestCase):
+    def setUp(self):
+        # 테스트용 유저 생성
+        self.user = User.objects.create_user(username="testuser", password="password123")
+        self.login_url = "/api/user/login/"
+
+    def test_login_success(self):
+        """로그인 성공 테스트"""
+        payload = {
+            "username": "testuser",
+            "password": "password123",
+        }
+        response = self.client.post(self.login_url, payload)
+
+        # 응답 확인
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["message"], "Logged in successfully")
+
+        # 세션 확인
+        self.assertIn("sessionid", response.cookies)
+
+    def test_login_invalid_password(self):
+        """잘못된 비밀번호로 인한 로그인 실패 테스트"""
+        payload = {
+            "username": "testuser",
+            "password": "wrongpassword",
+        }
+        response = self.client.post(self.login_url, payload)
+
+        # 응답 확인
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("non_field_errors", response.data)
+
+    def test_login_missing_fields(self):
+        """필드 누락으로 인한 로그인 실패 테스트"""
+        payload = {"username": "testuser"}
+        response = self.client.post(self.login_url, payload)
+
+        # 응답 확인
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("password", response.data)
+
+    def test_login_non_existent_user(self):
+        """존재하지 않는 유저로 인한 로그인 실패 테스트"""
+        payload = {
+            "username": "nonexistentuser",
+            "password": "password123",
+        }
+        response = self.client.post(self.login_url, payload)
+
+        # 응답 확인
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("non_field_errors", response.data)

@@ -95,7 +95,6 @@ CACHES = {
         "LOCATION": "redis://127.0.0.1:6379/1",  # Redis 서버의 위치
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "PASSWORD": None,  # Redis 비밀번호가 있는 경우 설정
         },
         "KEY_PREFIX": "blog_session",  # Redis 키에 붙는 접두사
     },
@@ -118,6 +117,10 @@ LOGGING = {
         "django.db.backends": {
             "handlers": ["console"],
             "level": "DEBUG",
+        },
+        "django_redis": {
+                    "handlers": ["console"],
+                    "level": "DEBUG",
         },
     },
 }
